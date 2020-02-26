@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.example.demo.entity.Item;
-import com.example.demo.service.MailSenderService;
+import com.example.demo.service.RestSampleService;
 
 // @Controller
 @RestController // Bodyをレスポンスとする
@@ -23,11 +23,11 @@ public class RestSampleController {
 	static Logger logger = LoggerFactory.getLogger(RestSampleController.class);
 
 	@Autowired
-	private Environment env;
-	
+	private RestSampleService restSampleService;
+
 	@Autowired
-	private MailSenderService mailSenderService;
-	
+	private Environment env;
+
 	@RequestMapping(value="/test", method=RequestMethod.GET, headers="Accept=application/*", params="id=002")
 	public String test() {
 		return "test";
@@ -39,7 +39,7 @@ public class RestSampleController {
 	@RequestParam("seq") String seq) {
 		return new Item();
 	}
-	
+
 	// 戻り値をそのままレスポンスのボディの内容とする
 	@RequestMapping("/directWrite")
 	public void directWrite(@RequestBody String body, Writer writer) throws IOException {
@@ -53,18 +53,18 @@ public class RestSampleController {
 	    mav.setViewName("test");
 	    return mav;
 	}
-	
+
 	// mail送付テスト用
 	@RequestMapping(value = "/sendTestMail", method = RequestMethod.POST)
 	public void sendTestMail() {
-		String subject = "月別集計バッチ処理 完了";
-		StringBuilder builder = new StringBuilder();
-		builder.append("Spring bootから送信。");
-		builder.append("内容です。");
-		String body = builder.toString();
-		
-		mailSenderService.sendMail(subject, body);
+		Boolean result = true;
+
+		if (result) {
+			restSampleService.sendMailComplete();
+		} else {
+			restSampleService.sendMailFailed();
+		}
 	}
-	
+
 }
 
