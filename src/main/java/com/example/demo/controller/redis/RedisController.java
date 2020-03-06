@@ -2,6 +2,7 @@ package com.example.demo.controller.redis;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -45,7 +46,7 @@ public class RedisController {
                 .rightPushAll("redis-tutorial:list",
                         redisSampleData.getList().toArray(new String[0]));
 
-        // マップ設定
+        // マップ設定(一括設定。性能改善用)
         redisTemplate.delete("redis-tutorial:map");
         redisTemplate.opsForHash()
                 .putAll("redis-tutorial:map", redisSampleData.getMap());
@@ -73,6 +74,17 @@ public class RedisController {
         );
         return redisSampleData;
     }
+
+    public void sample_method() {
+		// キャッシュ有効期限設定
+		RedisSampleData redisSampleData = new RedisSampleData();
+		redisTemplate.expire("myKey", 1, TimeUnit.MINUTES); // 有効期限1分
+		redisTemplate.expire("myKey", 6, TimeUnit.HOURS); // 有効期限6時間
+
+		// キャッシュ有効期限設定(Set時)
+		redisTemplate.opsForValue().set("myKey", "value", 1, TimeUnit.MINUTES); // 有効期限1分
+
+	}
 
     @Data
     @Getter
